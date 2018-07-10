@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         dbbutton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),MapActivity.class);
+                Intent intent = new Intent(getApplicationContext(),NMapViewer.class);
                 startActivity(intent);
                 List<dataFrame> dbList =  db.getAlldataFrames();
                 Log.e(TAG,"size: "+dbList.size());
