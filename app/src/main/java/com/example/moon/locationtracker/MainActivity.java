@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import com.nhn.android.maps.NMapActivity;
+import com.nhn.android.maps.NMapView;
 
 import java.util.List;
 
@@ -24,13 +26,17 @@ public class MainActivity extends AppCompatActivity {
     TextView tv;
     Button dbbutton;
     ToggleButton tb;
+    private NMapView mMapView;// 지도 화면 View
+    private final String CLIENT_ID = "Rfiu1FCN4mw9nHdVEqR4";// 애플리케이션 클라이언트 아이디 값
     private static final String TAG = "MainActivity";
     private DatabaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         db = new DatabaseHelper(this);
+
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION);
         if(permissionCheck != PackageManager.PERMISSION_GRANTED){
@@ -77,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         dbbutton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),MapActivity.class);
+                startActivity(intent);
                 List<dataFrame> dbList =  db.getAlldataFrames();
                 Log.e(TAG,"size: "+dbList.size());
                 for(int i=0;i<dbList.size();i++){
