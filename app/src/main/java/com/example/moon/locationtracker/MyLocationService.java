@@ -16,7 +16,7 @@ public class MyLocationService extends Service{
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 10000;
     private static final float LOCATION_DISTANCE = 1;
-
+    private DatabaseHelper dbhelper;
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
 
@@ -39,6 +39,8 @@ public class MyLocationService extends Service{
             //Network 위치는 Gps에 비해 정확도가 많이 떨어진다.
              Log.d(TAG,("위치정보 : " + provider + "\n위도 : " + longitude + "\n경도 : " + latitude
                     + "\n고도 : " + altitude + "\n정확도 : "  + accuracy));
+
+             dbhelper.insertDataframe(longitude,latitude);
         }
 
         @Override
@@ -80,25 +82,25 @@ public class MyLocationService extends Service{
     public void onCreate() {
         super.onCreate();
         Log.e(TAG, "onCreate");
-
+        dbhelper = new DatabaseHelper(this);
         initializeLocationManager();
 
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    LOCATION_INTERVAL*6,
+                    LOCATION_INTERVAL,
                     LOCATION_DISTANCE,
                     mLocationListeners[0]
             );
             mLocationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER,
-                    LOCATION_INTERVAL*6,
+                    LOCATION_INTERVAL,
                     LOCATION_DISTANCE,
                     mLocationListeners[1]
             );
             mLocationManager.requestLocationUpdates(
                     LocationManager.PASSIVE_PROVIDER,
-                    LOCATION_INTERVAL*6,
+                    LOCATION_INTERVAL,
                     LOCATION_DISTANCE,
                     mLocationListeners[2]
             );

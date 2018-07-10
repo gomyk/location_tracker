@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -21,12 +22,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     TextView tv;
+    Button dbbutton;
     ToggleButton tb;
-
+    private static final String TAG = "MainActivity";
+    private DatabaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        db = new DatabaseHelper(this);
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION);
         if(permissionCheck != PackageManager.PERMISSION_GRANTED){
@@ -51,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tv = (TextView) findViewById(R.id.textView2);
+        dbbutton = (Button)findViewById(R.id.showDB);
         tv.setText("위치정보 미수신중");
-
         tb = (ToggleButton)findViewById(R.id.toggle1);
         tb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +71,16 @@ public class MainActivity extends AppCompatActivity {
                         tv.setText("위치정보 미수신중");
                     }
                 }catch(SecurityException ex){
+                }
+            }
+        });
+        dbbutton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                List<dataFrame> dbList =  db.getAlldataFrames();
+                Log.e(TAG,"size: "+dbList.size());
+                for(int i=0;i<dbList.size();i++){
+                   Log.d(TAG,"DB : "+dbList.get(i).getTime()+" 위도: "+dbList.get(i).getLongitude() +" 경도: "+dbList.get(i).getLatitude()+"\n");
                 }
             }
         });
