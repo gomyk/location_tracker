@@ -1,21 +1,35 @@
 package com.example.moon.locationtracker;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 public class MyLocationService extends Service{
     private static final String TAG = "MyLocationService";
+    public static final String ACTION_FOREGROUND =
+            "com.example.moon.locationtracker.MyLocationService.FOREGROUND";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 10000;
-    private static final float LOCATION_DISTANCE = 1;
+    private static final int LOCATION_INTERVAL = 1000;//just for test
+    private static final float LOCATION_DISTANCE = 10;
+    private double before_long = 0.0;
+    private double before_lati = 0.0;
     private DatabaseHelper dbhelper;
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
@@ -39,8 +53,22 @@ public class MyLocationService extends Service{
             //Network 위치는 Gps에 비해 정확도가 많이 떨어진다.
              Log.d(TAG,("위치정보 : " + provider + "\n위도 : " + longitude + "\n경도 : " + latitude
                     + "\n고도 : " + altitude + "\n정확도 : "  + accuracy));
-
-             dbhelper.insertDataframe(longitude,latitude);
+            dbhelper.insertDataframe(longitude,latitude);
+             /*
+            if(dbhelper.getAlldataFrames().size() > 0) {
+                double dis = distance(before_lati,latitude,before_long,longitude,0,0);
+                Log.d(TAG,"distance : "+dis);
+                if( dis> 10){
+                    dbhelper.insertDataframe(longitude,latitude);
+                }
+            }
+            else{
+                dbhelper.insertDataframe(longitude,latitude);
+            }
+            before_lati = latitude;
+            before_long = longitude;
+            */
+            //need it when Distance value is not working
         }
 
         @Override
@@ -63,7 +91,6 @@ public class MyLocationService extends Service{
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER),
-            new LocationListener(LocationManager.PASSIVE_PROVIDER)
     };
 
     @Override
@@ -75,6 +102,7 @@ public class MyLocationService extends Service{
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
+        //Start service:
         return START_STICKY;
     }
 
@@ -97,12 +125,6 @@ public class MyLocationService extends Service{
                     LOCATION_INTERVAL,
                     LOCATION_DISTANCE,
                     mLocationListeners[1]
-            );
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.PASSIVE_PROVIDER,
-                    LOCATION_INTERVAL,
-                    LOCATION_DISTANCE,
-                    mLocationListeners[2]
             );
         } catch (java.lang.SecurityException ex) {
             Log.i(TAG, "fail to request location update, ignore", ex);
@@ -134,5 +156,24 @@ public class MyLocationService extends Service{
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
+    }
+    public static double distance(double lat1, double lat2, double lon1,
+                                  double lon2, double el1, double el2) {
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        double height = el1 - el2;
+
+        distance = Math.pow(distance, 2) + Math.pow(height, 2);
+
+        return Math.sqrt(distance);
     }
 }

@@ -1,13 +1,23 @@
 package com.example.moon.locationtracker;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -68,13 +78,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try{
-                    Intent locationServiceIntent = new Intent(MainActivity.this , MyLocationService.class);
+                    Intent locationServiceIntent = new Intent(MyLocationService.ACTION_FOREGROUND);
+                    locationServiceIntent.setClass(MainActivity.this , MyLocationService.class);
                     if(tb.isChecked()){
                         tv.setText("수신중..");
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(locationServiceIntent);
+                        } else {
+                            startService(locationServiceIntent);
+                        }
                         startService(locationServiceIntent);
                     }else{
-                        stopService(locationServiceIntent);
                         tv.setText("위치정보 미수신중");
+                        stopService(locationServiceIntent);
                     }
                 }catch(SecurityException ex){
                 }
@@ -102,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
 
                 } else {
 
