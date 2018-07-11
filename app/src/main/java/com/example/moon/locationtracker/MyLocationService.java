@@ -26,7 +26,7 @@ public class MyLocationService extends Service{
     public static final String ACTION_FOREGROUND =
             "com.example.moon.locationtracker.MyLocationService.FOREGROUND";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 1000;//just for test
+    private static final int LOCATION_INTERVAL = 10000;//just for test
     private static final float LOCATION_DISTANCE = 10;
     private double before_long = 0.0;
     private double before_lati = 0.0;
