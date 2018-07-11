@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Telephony;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -103,13 +105,7 @@ public class MyLocationService extends Service{
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
         //Start service:
-        return START_STICKY;
-    }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.e(TAG, "onCreate");
         dbhelper = new DatabaseHelper(this);
         initializeLocationManager();
 
@@ -131,6 +127,13 @@ public class MyLocationService extends Service{
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "network provider does not exist, " + ex.getMessage());
         }
+        return START_STICKY;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.e(TAG, "onCreate");
     }
 
     @Override

@@ -21,9 +21,11 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -35,6 +37,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     TextView tv;
     Button dbbutton;
+    Button send;
     ToggleButton tb;
     private NMapView mMapView;// 지도 화면 View
     private final String CLIENT_ID = "Rfiu1FCN4mw9nHdVEqR4";// 애플리케이션 클라이언트 아이디 값
@@ -47,12 +50,15 @@ public class MainActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(this);
 
-        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        if(permissionCheck != PackageManager.PERMISSION_GRANTED){
+        int permissionCheck = (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION));
+        int permissionCheck_SMS = (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.SEND_SMS));
+        if(permissionCheck != PackageManager.PERMISSION_GRANTED || permissionCheck_SMS != PackageManager.PERMISSION_GRANTED){
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Manifest.permission.ACCESS_FINE_LOCATION) && ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.SEND_SMS)) {
                 // Show an expanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
@@ -61,9 +67,8 @@ public class MainActivity extends AppCompatActivity {
                 // No explanation needed, we can request the permission.
 
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS},
                         200);
-
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
                 // result of the request.
@@ -71,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tv = (TextView) findViewById(R.id.textView2);
+        send = (Button)findViewById(R.id.sendSMS);
         dbbutton = (Button)findViewById(R.id.showDB);
         tv.setText("위치정보 미수신중");
         tb = (ToggleButton)findViewById(R.id.toggle1);
@@ -106,6 +112,14 @@ public class MainActivity extends AppCompatActivity {
                 for(int i=0;i<dbList.size();i++){
                    Log.d(TAG,"DB : "+dbList.get(i).getTime()+" 위도: "+dbList.get(i).getLongitude() +" 경도: "+dbList.get(i).getLatitude()+"\n");
                 }
+            }
+        });
+        send.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                EditText phone  = (EditText)findViewById(R.id.phonenum);
+                EditText text = (EditText)findViewById(R.id.text);
+                SmsManager.getDefault().sendTextMessage(phone.getText().toString(), null,text.getText().toString(), null, null);
             }
         });
     }
