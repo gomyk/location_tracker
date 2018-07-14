@@ -28,8 +28,8 @@ public class MyLocationService extends Service{
     public static final String ACTION_FOREGROUND =
             "com.example.moon.locationtracker.MyLocationService.FOREGROUND";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 10000;//just for test
-    private static final float LOCATION_DISTANCE = 10;
+    private static final int LOCATION_INTERVAL = 5000;//just for test
+    private static final float LOCATION_DISTANCE = 1;
     private double before_long = 0.0;
     private double before_lati = 0.0;
     private DatabaseHelper dbhelper;
@@ -55,7 +55,10 @@ public class MyLocationService extends Service{
             //Network 위치는 Gps에 비해 정확도가 많이 떨어진다.
              Log.d(TAG,("위치정보 : " + provider + "\n위도 : " + longitude + "\n경도 : " + latitude
                     + "\n고도 : " + altitude + "\n정확도 : "  + accuracy));
-            dbhelper.insertDataframe(longitude,latitude);
+             if(accuracy >= 20.0){
+                 dbhelper.insertDataframe(longitude,latitude);
+             }
+
              /*
             if(dbhelper.getAlldataFrames().size() > 0) {
                 double dis = distance(before_lati,latitude,before_long,longitude,0,0);

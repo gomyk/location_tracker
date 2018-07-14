@@ -54,11 +54,15 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION));
         int permissionCheck_SMS = (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.SEND_SMS));
-        if(permissionCheck != PackageManager.PERMISSION_GRANTED || permissionCheck_SMS != PackageManager.PERMISSION_GRANTED){
+        int permissionCheck_ReceiveSMS = (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.RECEIVE_SMS));
+        if(permissionCheck != PackageManager.PERMISSION_GRANTED || permissionCheck_SMS != PackageManager.PERMISSION_GRANTED
+                || permissionCheck_ReceiveSMS != PackageManager.PERMISSION_GRANTED ){
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION) && ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.SEND_SMS)) {
+                    Manifest.permission.SEND_SMS)&& ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.RECEIVE_SMS)) {
                 // Show an expanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
@@ -67,14 +71,13 @@ public class MainActivity extends AppCompatActivity {
                 // No explanation needed, we can request the permission.
 
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS},
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS,Manifest.permission.RECEIVE_SMS},
                         200);
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
         }
-
         tv = (TextView) findViewById(R.id.textView2);
         send = (Button)findViewById(R.id.sendSMS);
         dbbutton = (Button)findViewById(R.id.showDB);

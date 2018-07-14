@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ public class SMSReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("리시버 : ","호잇");
+        SmsManager.getDefault().sendTextMessage("01051760970", null,"리시버 작동!", null, null);
         // SMS를 받았을 경우에만 반응하도록 if문을 삽입
         if (intent.getAction().equals(
                 "android.provider.Telephony.SMS_RECEIVED")) {
